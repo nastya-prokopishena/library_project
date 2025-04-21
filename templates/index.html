@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Головна - Бібліотечний сервіс{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-8 offset-md-2 text-center">
+        <h1 class="display-4">Ласкаво просимо до Бібліотечного сервісу</h1>
+        <p class="lead mt-4">
+            Наш сервіс дозволяє легко шукати, позичати та повертати книги онлайн.
+        </p>
+        
+        <div class="d-flex justify-content-center mt-5">
+            <a href="/books" class="btn btn-primary btn-lg mx-2">Переглянути книги</a>
+            <a href="/register" class="btn btn-outline-primary btn-lg mx-2" id="register-btn">Зареєструватися</a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Пошук книг</h5>
+                <p class="card-text">Легко знаходьте книги, які вас цікавлять, у нашій великій колекції.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Позичання книг</h5>
+                <p class="card-text">Позичайте книги онлайн і отримуйте доступ до них у своєму профілі.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Управління позиченими книгами</h5>
+                <p class="card-text">Переглядайте статус ваших позичених книг та повертайте їх в один клік.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            document.getElementById('register-btn').classList.add('d-none');
+        }
+    });
+</script>
+{% endblock %}

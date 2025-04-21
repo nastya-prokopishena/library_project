@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Мій профіль - Бібліотечний сервіс{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Мій профіль</h2>
+        <div id="user-info" class="mb-4">
+            <p>Завантаження...</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h3>Мої позичені книги</h3>
+        <div id="borrowed-books">
+            <p>Завантаження...</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userId = localStorage.getItem('userId');
+        const userName = localStorage.getItem('userName');
+        
+        if (!userId) {
+            window.location.href = '/login';
+            return;
+        }
+        
+        // Відображаємо інформацію про користувача
+        const userInfo = document.getElementById('user-info');
+        userInfo.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${userName}</h5>
+                    <p class="card-text">ID користувача: ${userId}</p>
+                </div>
+            </div>
+        `;
+        
+        // Завантажуємо позичені книги
+        fetch(`/api/users/${userId}/books`)
+            .then(response => response.json())
+            .then(data => {
+                const borrowedBooksContainer = document.getElementById('borrowed-books');
+                
+                if (data.success) {
+                    if (data.books.length === 0) {
+                        borrowedBooksContainer.innerHTML = '<p>У вас немає позичених книг.</p>';
+                        return;
+                    }
+                    
+                    const booksHtml = `
+                        <div class="row">
+                            ${data.books.map(book => `
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${book.title}</h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">${book.author}</h6>
+                                            <p class="card-text">Жанр: ${book.genre}</p>
+                                        </div>
+                                        <div class="card-footer bg-white">
+                                            <button class="btn btn-success btn-sm return-btn" data-id="${book.book_id}">Повернути</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    borrowedBooksContainer.innerHTML = booksHtml;
+                    
+                    // Додаємо обробники подій для кнопок "Повернути"
+                    document.querySelectorAll('.return-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const bookId = this.getAttribute('data-id');
+                            
+                            fetch(`/api/users/${userId}/books/${bookId}/return`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Книгу успішно повернуто!');
+                                    window.location.reload();
+                                } else {
+                                    alert(`Помилка: ${data.error}`);
+                                }
+                            });
+                        });
+                    });
+                } else {
+                    borrowedBooksContainer.innerHTML = `<p>Помилка: ${data.error}</p>`;
+                }
+            });
+    });
+</script>
+{% endblock %}

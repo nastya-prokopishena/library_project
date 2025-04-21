@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Бібліотечний сервіс{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .book-card {
+            margin-bottom: 20px;
+        }
+        .nav-link.active {
+            font-weight: bold;
+        }
+        .container {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Бібліотечний сервіс</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Головна</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/books">Книги</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item" id="login-nav">
+                        <a class="nav-link" href="/login">Увійти</a>
+                    </li>
+                    <li class="nav-item" id="register-nav">
+                        <a class="nav-link" href="/register">Зареєструватися</a>
+                    </li>
+                    <li class="nav-item d-none" id="profile-nav">
+                        <a class="nav-link" href="/profile">Мій профіль</a>
+                    </li>
+                    <li class="nav-item d-none" id="logout-nav">
+                        <a class="nav-link" href="#" id="logout-link">Вийти</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Перевірка чи користувач авторизований
+        document.addEventListener('DOMContentLoaded', function() {
+            const userId = localStorage.getItem('userId');
+            if (userId) {
+                document.getElementById('login-nav').classList.add('d-none');
+                document.getElementById('register-nav').classList.add('d-none');
+                document.getElementById('profile-nav').classList.remove('d-none');
+                document.getElementById('logout-nav').classList.remove('d-none');
+            }
+
+            // Обробник кліку на посиланні виходу
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+
+                fetch('/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('userName');
+                        window.location.href = '/';
+                    }
+                });
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
